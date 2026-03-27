@@ -1,0 +1,21 @@
+version: "1.0"
+
+hosts:
+  ali-dev:
+    addr: "192.168.1.100:22"
+    user: "deploy"
+  ali-prod:
+    addr: "192.168.1.101:22"
+    user: "deploy"
+
+projects:
+  - name: "api-server"
+    repo: "git@github.com:user/api-server.git"
+    path: "/opt/api-server"
+    envs:
+      dev: ["ali-dev"]
+      prod: ["ali-prod"]
+    scripts:
+      deploy: |
+        docker-compose down
+        docker-compose up -d --build
