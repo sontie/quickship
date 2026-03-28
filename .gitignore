@@ -1,0 +1,21 @@
+# 编译产物
+qship
+qship-*
+*.exe
+
+# Go 相关
+go.sum
+
+# 临时文件
+*.log
+*.tmp
+.DS_Store
+
+# 配置文件（用户自己生成）
+qship.yaml
+deploy.yaml
+
+# 构建目录
+dist/
+*.tar.gz
+*.zip

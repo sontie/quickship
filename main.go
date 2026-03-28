@@ -9,7 +9,7 @@ import (
 	"quickship/internal/config"
 )
 
-const Version = "1.0.0"
+const Version = "0.1.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -29,7 +29,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Println("✓ Created deploy.yaml")
+		fmt.Println("✓ Created qship.yaml")
 
 	case "check":
 		if err := cmd.Check(); err != nil {
@@ -48,7 +48,7 @@ func main() {
 		}
 
 	case "list":
-		cfg, err := config.LoadConfig("deploy.yaml")
+		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
@@ -60,7 +60,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Usage: qship deploy <env>")
 			os.Exit(1)
 		}
-		cfg, err := config.LoadConfig("deploy.yaml")
+		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
@@ -76,7 +76,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Usage: qship exec \"<command>\" [host1,host2,...]")
 			os.Exit(1)
 		}
-		cfg, err := config.LoadConfig("deploy.yaml")
+		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)

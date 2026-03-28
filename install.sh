@@ -1,51 +1,59 @@
 #!/bin/bash
 set -e
 
-echo "Installing QuickShip..."
-
-# 检测操作系统
-OS=$(uname -s)
-ARCH=$(uname -m)
-
-# 设置二进制文件名
+REPO="sontie/quickship"
+VERSION="v0.1.0"
 BINARY="qship"
 
-# 检查二进制文件是否存在
-if [ ! -f "$BINARY" ]; then
-    echo "Error: $BINARY not found in current directory"
-    echo "Please run this script in the same directory as the qship binary"
+echo "Installing QuickShip ${VERSION}..."
+
+# 检测操作系统和架构
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+case "$OS" in
+    linux) OS="linux" ;;
+    darwin) OS="darwin" ;;
+    *) echo "Unsupported OS: $OS"; exit 1 ;;
+esac
+
+case "$ARCH" in
+    x86_64|amd64) ARCH="amd64" ;;
+    arm64|aarch64) ARCH="arm64" ;;
+    *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
+
+# 构建下载 URL
+FILENAME="${BINARY}-${OS}-${ARCH}"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${FILENAME}"
+
+echo "Downloading ${FILENAME}..."
+TMP_FILE="/tmp/${BINARY}"
+
+if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"
+elif command -v wget >/dev/null 2>&1; then
+    wget -q "$DOWNLOAD_URL" -O "$TMP_FILE"
+else
+    echo "Error: curl or wget is required"
     exit 1
 fi
 
-# 添加执行权限
-chmod +x "$BINARY"
+chmod +x "$TMP_FILE"
 
-# 根据操作系统选择安装路径
-case "$OS" in
-    Linux*)
-        INSTALL_PATH="/usr/local/bin"
-        ;;
-    Darwin*)
-        INSTALL_PATH="/usr/local/bin"
-        ;;
-    *)
-        echo "Unsupported OS: $OS"
-        exit 1
-        ;;
-esac
+# 安装到系统路径
+INSTALL_PATH="/usr/local/bin"
 
-# 检查是否需要 sudo
 if [ -w "$INSTALL_PATH" ]; then
-    mv "$BINARY" "$INSTALL_PATH/"
+    mv "$TMP_FILE" "$INSTALL_PATH/$BINARY"
 else
     echo "Installing to $INSTALL_PATH (requires sudo)..."
-    sudo mv "$BINARY" "$INSTALL_PATH/"
+    sudo mv "$TMP_FILE" "$INSTALL_PATH/$BINARY"
 fi
 
-echo "✓ QuickShip installed successfully to $INSTALL_PATH/$BINARY"
+echo "✓ QuickShip installed successfully!"
 echo ""
 echo "Usage:"
+echo "  qship version    # Check version"
 echo "  qship init       # Initialize configuration"
 echo "  qship deploy dev # Deploy to environment"
-echo ""
-echo "Run 'qship' to see all commands"

@@ -33,7 +33,7 @@ projects:
         docker-compose down
         docker-compose up -d --build
 `
-	return os.WriteFile("deploy.yaml", []byte(template), 0644)
+	return os.WriteFile("qship.yaml", []byte(template), 0644)
 }
 
 func Check() error {

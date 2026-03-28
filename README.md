@@ -11,40 +11,39 @@
 
 ## 安装
 
-### 方式一：使用安装脚本（推荐）
+### 方式一：一键安装（推荐）
 
 **Linux/macOS:**
 ```bash
-# 下载对应平台的二进制文件和安装脚本
-chmod +x install.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/sontie/quickship/main/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/install.ps1 | iex
+```
+
+### 方式二：下载二进制文件
+
+从 [Releases](https://github.com/sontie/quickship/releases) 下载对应平台的文件：
+
+**Linux/macOS:**
+```bash
+chmod +x qship-*
+sudo mv qship-* /usr/local/bin/qship
 ```
 
 **Windows:**
-```cmd
-# 下载 qship.exe 和 install.bat
-install.bat
-```
+下载 `qship-windows-amd64.exe`，重命名为 `qship.exe` 并添加到 PATH。
 
-### 方式二：手动编译
+### 方式三：从源码编译
 
 需要 Go 1.19+ 环境：
 
 ```bash
+git clone https://github.com/sontie/quickship.git
+cd quickship
 go build -o qship
-```
-
-### 方式三：交叉编译多平台版本
-
-```bash
-# Linux
-GOOS=linux GOARCH=amd64 go build -o qship-linux
-
-# macOS
-GOOS=darwin GOARCH=amd64 go build -o qship-darwin
-
-# Windows
-GOOS=windows GOARCH=amd64 go build -o qship.exe
 ```
 
 ## 快速开始
@@ -55,32 +54,37 @@ GOOS=windows GOARCH=amd64 go build -o qship.exe
 qship init
 ```
 
-生成 `deploy.yaml` 配置文件模板。
+生成 `qship.yaml` 配置文件模板。
 
 ### 2. 编辑配置
 
-编辑 `deploy.yaml`，配置主机和项目信息：
+编辑 `qship.yaml`，配置主机和项目信息。
+
+#### 配置文件说明
 
 ```yaml
+# 配置文件版本
 version: "1.0"
 
+# 主机列表
 hosts:
-  ali-dev:
-    addr: "192.168.1.100:22"
-    user: "deploy"
+  ali-dev:                    # 主机别名
+    addr: "192.168.1.100:22"  # SSH 地址和端口
+    user: "deploy"            # SSH 用户名
   ali-prod:
     addr: "192.168.1.101:22"
     user: "deploy"
 
+# 项目列表
 projects:
-  - name: "api-server"
-    repo: "git@github.com:user/api-server.git"
-    path: "/opt/api-server"
-    envs:
-      dev: ["ali-dev"]
-      prod: ["ali-prod"]
-    scripts:
-      deploy: |
+  - name: "api-server"                        # 项目名称
+    repo: "git@github.com:user/api-server.git" # Git 仓库地址
+    path: "/opt/api-server"                   # 远程服务器部署路径
+    envs:                                     # 环境配置
+      dev: ["ali-dev"]                        # dev 环境部署到 ali-dev 主机
+      prod: ["ali-prod"]                      # prod 环境部署到 ali-prod 主机
+    scripts:                                  # 部署脚本
+      deploy: |                               # deploy 脚本内容
         docker-compose down
         docker-compose up -d --build
 ```
@@ -115,6 +119,15 @@ qship deploy dev
 部署到指定环境（dev/prod）。
 
 ## 命令说明
+
+### qship version / -v / --version
+查看版本信息。
+
+```bash
+qship version
+qship -v
+qship --version
+```
 
 ### qship init
 生成默认配置文件 `deploy.yaml`。
