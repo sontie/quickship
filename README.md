@@ -23,6 +23,22 @@ curl -fsSL https://raw.githubusercontent.com/sontie/quickship/main/install.sh | 
 iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/install.ps1 | iex
 ```
 
+### 卸载
+
+**Linux/macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/sontie/quickship/main/uninstall.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/uninstall.ps1 | iex
+```
+
+或手动删除：
+- Linux/macOS: `sudo rm /usr/local/bin/qship && rm -rf ~/.quickship`
+- Windows: 删除 `qship.exe` 和 `%USERPROFILE%\.quickship` 目录
+
 ### 方式二：下载二进制文件
 
 从 [Releases](https://github.com/sontie/quickship/releases) 下载对应平台的文件：
