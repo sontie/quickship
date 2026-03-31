@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $REPO = "sontie/quickship"
-$VERSION = "v0.1.0"
+$VERSION = "v0.1.1"
 $BINARY = "qship.exe"
 
 Write-Host "Installing QuickShip $VERSION..." -ForegroundColor Green

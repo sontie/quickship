@@ -2,7 +2,7 @@
 set -e
 
 REPO="sontie/quickship"
-VERSION="v0.1.0"
+VERSION="v0.1.1"
 BINARY="qship"
 
 echo "Installing QuickShip ${VERSION}..."
