@@ -39,6 +39,34 @@ iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/uninstall.ps1 
 - Linux/macOS: `sudo rm /usr/local/bin/qship && rm -rf ~/.quickship`
 - Windows: 删除 `qship.exe` 和 `%USERPROFILE%\.quickship` 目录
 
+### 升级
+
+**如果已安装 v0.1.1 或更新版本：**
+```bash
+qship upgrade
+```
+
+**如果安装的是旧版本（无 upgrade 命令）：**
+
+重新运行安装脚本会自动覆盖旧版本：
+
+**Linux/macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/sontie/quickship/main/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/install.ps1 | iex
+```
+
+或手动下载最新二进制文件替换：
+```bash
+curl -L -o qship https://github.com/sontie/quickship/releases/download/v0.1.1/qship-darwin-arm64
+chmod +x qship
+sudo mv qship /usr/local/bin/qship
+```
+
 ### 方式二：下载二进制文件
 
 从 [Releases](https://github.com/sontie/quickship/releases) 下载对应平台的文件：
@@ -105,23 +133,22 @@ projects:
         docker-compose up -d --build
 ```
 
-### 3. 检查 SSH Agent
+### 3. 环境准备
+
+运行以下命令检查 SSH 环境，如有问题会给出引导：
 
 ```bash
 qship check
 ```
 
-确保 ssh-agent 正在运行且已加载密钥。如果未启动：
-
-```bash
-eval $(ssh-agent)
-ssh-add ~/.ssh/id_rsa
-```
+如果你已熟悉 SSH，可自行配置；如果不熟悉，按照提示操作即可。
 
 ### 4. 查看配置
 
 ```bash
 qship list
+# 或使用简写
+qship ls
 ```
 
 显示所有主机和项目的配置信息。
@@ -146,7 +173,7 @@ qship --version
 ```
 
 ### qship init
-生成默认配置文件 `deploy.yaml`。
+生成默认配置文件 `qship.yaml`。
 
 ### qship check
 检查 SSH Agent 状态和已加载的密钥。
@@ -158,7 +185,7 @@ qship --version
 qship auth deploy@192.168.1.100
 ```
 
-### qship list
+### qship list / ls
 列出所有配置的主机和项目信息。
 
 ### qship deploy <env>
@@ -167,6 +194,18 @@ qship auth deploy@192.168.1.100
 ```bash
 qship deploy dev    # 部署到开发环境
 qship deploy prod   # 部署到生产环境
+```
+
+### qship upgrade
+自动检查并升级到最新版本。
+
+```bash
+qship upgrade
+```
+
+如果安装在系统目录需要权限：
+```bash
+sudo qship upgrade
 ```
 
 ### qship exec "<command>" [hosts]

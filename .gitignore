@@ -13,9 +13,7 @@ go.sum
 
 # 配置文件（用户自己生成）
 qship.yaml
-deploy.yaml
+qship.yaml
 
 # 构建目录
-dist/
-*.tar.gz
-*.zip
+release/

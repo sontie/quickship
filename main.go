@@ -9,7 +9,7 @@ import (
 	"quickship/internal/config"
 )
 
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -47,7 +47,7 @@ func main() {
 			os.Exit(1)
 		}
 
-	case "list":
+	case "list", "ls":
 		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -96,6 +96,12 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "upgrade":
+		if err := cmd.Upgrade(Version); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
 	default:
 		printUsage()
 		os.Exit(1)
@@ -107,10 +113,11 @@ func printUsage() {
 
 Usage:
   qship version                 Show version information
-  qship init                    Generate deploy.yaml template
+  qship init                    Generate qship.yaml template
   qship check                   Check SSH agent status
   qship auth <host>             Copy SSH key to host
-  qship list                    List hosts and projects
+  qship list / ls               List hosts and projects
   qship deploy <env>            Deploy to environment
-  qship exec "<cmd>" [hosts]    Execute command on hosts`)
+  qship exec "<cmd>" [hosts]    Execute command on hosts
+  qship upgrade                 Upgrade to latest version`)
 }

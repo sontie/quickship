@@ -1,44 +1,26 @@
 #!/bin/bash
 set -e
 
-VERSION="1.0.0"
-OUTPUT_DIR="dist"
+VERSION="0.1.1"
+OUTPUT_DIR="release"
 
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 echo "Building QuickShip v${VERSION}..."
 
-# Linux amd64
-GOOS=linux GOARCH=amd64 go build -o "$OUTPUT_DIR/qship"
-cp install.sh "$OUTPUT_DIR/"
-(cd "$OUTPUT_DIR" && tar czf "../quickship-${VERSION}-linux-amd64.tar.gz" qship install.sh)
-rm "$OUTPUT_DIR/qship"
+GOOS=linux GOARCH=amd64 go build -o "$OUTPUT_DIR/qship-linux-amd64"
 echo "✓ linux-amd64"
 
-# macOS Intel
-GOOS=darwin GOARCH=amd64 go build -o "$OUTPUT_DIR/qship"
-cp install.sh "$OUTPUT_DIR/"
-(cd "$OUTPUT_DIR" && tar czf "../quickship-${VERSION}-darwin-amd64.tar.gz" qship install.sh)
-rm "$OUTPUT_DIR/qship"
+GOOS=darwin GOARCH=amd64 go build -o "$OUTPUT_DIR/qship-darwin-amd64"
 echo "✓ darwin-amd64"
 
-# macOS Apple Silicon
-GOOS=darwin GOARCH=arm64 go build -o "$OUTPUT_DIR/qship"
-cp install.sh "$OUTPUT_DIR/"
-(cd "$OUTPUT_DIR" && tar czf "../quickship-${VERSION}-darwin-arm64.tar.gz" qship install.sh)
-rm "$OUTPUT_DIR/qship"
+GOOS=darwin GOARCH=arm64 go build -o "$OUTPUT_DIR/qship-darwin-arm64"
 echo "✓ darwin-arm64"
 
-# Windows
-GOOS=windows GOARCH=amd64 go build -o "$OUTPUT_DIR/qship.exe"
-cp install.bat "$OUTPUT_DIR/"
-(cd "$OUTPUT_DIR" && zip -q "../quickship-${VERSION}-windows-amd64.zip" qship.exe install.bat)
-rm "$OUTPUT_DIR/qship.exe"
+GOOS=windows GOARCH=amd64 go build -o "$OUTPUT_DIR/qship-windows-amd64.exe"
 echo "✓ windows-amd64"
 
-rm -rf "$OUTPUT_DIR"
-
 echo ""
-echo "Done! Distribution packages:"
-ls -lh quickship-${VERSION}-*
+echo "Done! Distribution files:"
+ls -lh "$OUTPUT_DIR"/

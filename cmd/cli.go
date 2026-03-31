@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"quickship/internal/config"
@@ -37,18 +39,94 @@ projects:
 }
 
 func Check() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("cannot determine home directory: %w", err)
+	}
+	sshDir := filepath.Join(home, ".ssh")
+
+	allPassed := true
+
+	// Step 1: 检查 SSH 密钥是否存在
+	fmt.Println("Step 1: Checking SSH key...")
+	keyPath := ""
+	candidates := []string{
+		filepath.Join(sshDir, "id_ed25519"),
+		filepath.Join(sshDir, "id_rsa"),
+	}
+	for _, c := range candidates {
+		if _, err := os.Stat(c); err == nil {
+			keyPath = c
+			break
+		}
+	}
+	if keyPath == "" {
+		fmt.Println("  ✗ No SSH key found (~/.ssh/id_ed25519 or ~/.ssh/id_rsa)")
+		fmt.Println("  → Run: ssh-keygen -t ed25519 -C \"your@email.com\"")
+		allPassed = false
+	} else {
+		fmt.Printf("  ✓ SSH key:   %s\n", keyPath)
+	}
+
+	// Step 2: 检查 SSH Agent 是否运行
+	fmt.Println("Step 2: Checking SSH Agent...")
 	sock := os.Getenv("SSH_AUTH_SOCK")
 	if sock == "" {
-		return fmt.Errorf("SSH_AUTH_SOCK not set. Run: eval $(ssh-agent) && ssh-add")
+		fmt.Println("  ✗ SSH_AUTH_SOCK is not set (SSH Agent not running)")
+		fmt.Println("  → Run: eval $(ssh-agent)")
+		allPassed = false
+	} else {
+		fmt.Printf("  ✓ SSH Agent: %s\n", sock)
 	}
-	fmt.Printf("✓ SSH Agent: %s\n", sock)
 
-	cmd := exec.Command("ssh-add", "-l")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("no keys in agent. Run: ssh-add")
+	// Step 3: 检查 Agent 是否已加载密钥
+	fmt.Println("Step 3: Checking loaded keys...")
+	var keyCount int
+	if sock != "" {
+		cmd := exec.Command("ssh-add", "-l")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Println("  ✗ No keys loaded in SSH Agent")
+			addTarget := "~/.ssh/id_ed25519"
+			if keyPath != "" {
+				addTarget = keyPath
+			}
+			fmt.Printf("  → Run: ssh-add %s\n", addTarget)
+			allPassed = false
+		} else {
+			lines := strings.TrimSpace(string(output))
+			keyCount = len(strings.Split(lines, "\n"))
+			fmt.Printf("  ✓ Keys loaded: %d key(s)\n", keyCount)
+		}
+	} else {
+		fmt.Println("  - Skipped (SSH Agent not running)")
 	}
-	fmt.Printf("✓ Keys loaded:\n%s", output)
+
+	// Step 4: 建议 ~/.ssh/config 持久化配置
+	fmt.Println("Step 4: Checking SSH config (optional)...")
+	configPath := filepath.Join(sshDir, "config")
+	configContent, err := os.ReadFile(configPath)
+	hasAddKeysToAgent := err == nil && strings.Contains(string(configContent), "AddKeysToAgent")
+	if hasAddKeysToAgent {
+		fmt.Println("  ✓ SSH config has AddKeysToAgent configured")
+	} else {
+		fmt.Println("  ⓘ Tip: Add the following to ~/.ssh/config to avoid running ssh-add after each reboot:")
+		fmt.Println("")
+		fmt.Println("    Host *")
+		fmt.Println("      AddKeysToAgent yes")
+		if runtime.GOOS == "darwin" {
+			fmt.Println("      UseKeychain yes")
+		}
+		fmt.Println("")
+	}
+
+	// 汇总结果
+	fmt.Println("---")
+	if allPassed {
+		fmt.Println("✓ SSH environment is ready!")
+	} else {
+		return fmt.Errorf("SSH environment is not ready. Please fix the issues above and re-run: qship check")
+	}
 	return nil
 }
 
