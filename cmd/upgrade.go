@@ -37,7 +37,7 @@ func Upgrade(currentVersion string) error {
 	osName := runtime.GOOS
 	arch := runtime.GOARCH
 
-	filename := fmt.Sprintf("qship-%s-%s", osName, arch)
+	filename := fmt.Sprintf("quickship-%s-%s", osName, arch)
 	if osName == "windows" {
 		filename += ".exe"
 	}
