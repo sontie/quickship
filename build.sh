@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-VERSION=$(cat VERSION)
+# 从 Git tag 读取版本号，如果没有 tag 则使用 dev
+VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
 OUTPUT_DIR="release"
 
 rm -rf "$OUTPUT_DIR"
