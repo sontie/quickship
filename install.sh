@@ -2,7 +2,7 @@
 set -e
 
 REPO="sontie/quickship"
-VERSION="v0.1.1"
+VERSION="v$(curl -fsSL https://raw.githubusercontent.com/${REPO}/main/VERSION)"
 BINARY="qship"
 
 echo "Installing QuickShip ${VERSION}..."

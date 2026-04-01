@@ -9,7 +9,7 @@ import (
 	"quickship/internal/config"
 )
 
-const Version = "0.1.2"
+var Version = "dev"
 
 func main() {
 	if len(os.Args) < 2 {

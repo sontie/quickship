@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $REPO = "sontie/quickship"
-$VERSION = "v0.1.1"
+$VERSION = "v" + (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/$REPO/main/VERSION" -UseBasicParsing).Content.Trim()
 $BINARY = "qship.exe"
 
 Write-Host "Installing QuickShip $VERSION..." -ForegroundColor Green

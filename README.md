@@ -41,7 +41,7 @@ iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/uninstall.ps1 
 
 ### 升级
 
-**如果已安装 v0.1.1 或更新版本：**
+**如果已安装 v0.1.1+ 或更新版本：**
 ```bash
 qship upgrade
 ```
@@ -62,7 +62,8 @@ iwr -useb https://raw.githubusercontent.com/sontie/quickship/main/install.ps1 | 
 
 或手动下载最新二进制文件替换：
 ```bash
-curl -L -o qship https://github.com/sontie/quickship/releases/download/v0.1.1/qship-darwin-arm64
+# 从 GitHub Releases 获取最新版本
+curl -L -o qship https://github.com/sontie/quickship/releases/latest/download/qship-darwin-arm64
 chmod +x qship
 sudo mv qship /usr/local/bin/qship
 ```
