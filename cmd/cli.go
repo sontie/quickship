@@ -153,9 +153,9 @@ func List(cfg *config.Config) {
 	}
 }
 
-func Deploy(env string, cfg *config.Config) error {
+func Deploy(env string, gitOnly bool, cfg *config.Config) error {
 	fmt.Printf("Deploying to %s environment...\n", env)
-	return executor.Deploy(env, cfg)
+	return executor.Deploy(env, gitOnly, cfg)
 }
 
 func Exec(cmd string, hosts []string, cfg *config.Config) error {

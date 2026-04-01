@@ -17,7 +17,7 @@ var colors = []color.Attribute{
 	color.FgBlue,
 }
 
-func Deploy(env string, cfg *config.Config) error {
+func Deploy(env string, gitOnly bool, cfg *config.Config) error {
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(cfg.Projects))
 
@@ -45,7 +45,7 @@ func Deploy(env string, cfg *config.Config) error {
 				}
 				defer client.Close()
 
-				if err := client.DeployProject(p); err != nil {
+				if err := client.DeployProject(p, gitOnly); err != nil {
 					errChan <- err
 				}
 			}(host, project, i)

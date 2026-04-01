@@ -90,7 +90,12 @@ func (c *Client) streamOutput(r io.Reader, isErr bool) {
 	}
 }
 
-func (c *Client) DeployProject(project config.Project) error {
+func (c *Client) DeployProject(project config.Project, gitOnly bool) error {
+	deployScript := ""
+	if !gitOnly {
+		deployScript = project.Scripts["deploy"]
+	}
+
 	script := fmt.Sprintf(`
 cd %s 2>/dev/null || (mkdir -p %s && cd %s)
 if [ ! -d ".git" ]; then
@@ -99,7 +104,7 @@ else
     git pull
 fi
 %s
-`, project.Path, project.Path, project.Path, project.Repo, project.Scripts["deploy"])
+`, project.Path, project.Path, project.Path, project.Repo, deployScript)
 
 	return c.ExecuteCommand(script)
 }

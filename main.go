@@ -9,7 +9,7 @@ import (
 	"quickship/internal/config"
 )
 
-const Version = "0.1.1"
+const Version = "0.1.2"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -57,15 +57,19 @@ func main() {
 
 	case "deploy":
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, "Usage: qship deploy <env>")
+			fmt.Fprintln(os.Stderr, "Usage: qship deploy <env> [--git-only]")
 			os.Exit(1)
+		}
+		gitOnly := false
+		if len(os.Args) > 3 && os.Args[3] == "--git-only" {
+			gitOnly = true
 		}
 		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		if err := cmd.Deploy(os.Args[2], cfg); err != nil {
+		if err := cmd.Deploy(os.Args[2], gitOnly, cfg); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
@@ -117,7 +121,7 @@ Usage:
   qship check                   Check SSH agent status
   qship auth <host>             Copy SSH key to host
   qship list / ls               List hosts and projects
-  qship deploy <env>            Deploy to environment
+  qship deploy <env> [--git-only]    Deploy to environment
   qship exec "<cmd>" [hosts]    Execute command on hosts
   qship upgrade                 Upgrade to latest version`)
 }
