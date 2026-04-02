@@ -97,14 +97,42 @@ func (c *Client) DeployProject(project config.Project, gitOnly bool) error {
 	}
 
 	script := fmt.Sprintf(`
-cd %s 2>/dev/null || (mkdir -p %s && cd %s)
+if [ ! -d "%s" ]; then
+    mkdir -p %s 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "ERROR: Permission denied - cannot create directory %s"
+        echo ""
+        echo "Please run the following commands on the server first:"
+        echo "  sudo mkdir -p %s"
+        echo "  sudo chown -R $USER:$USER %s"
+        echo ""
+        echo "Or configure passwordless sudo for this user:"
+        echo "  echo '$USER ALL=(ALL) NOPASSWD: /bin/mkdir, /bin/chown' | sudo tee /etc/sudoers.d/$USER"
+        echo ""
+        exit 1
+    fi
+fi
+if [ ! -w "%s" ]; then
+    echo ""
+    echo "ERROR: No write permission to directory %s"
+    echo ""
+    echo "Please run on the server:"
+    echo "  sudo chown -R $USER:$USER %s"
+    echo ""
+    exit 1
+fi
+cd %s
 if [ ! -d ".git" ]; then
     git clone %s .
 else
     git pull
 fi
 %s
-`, project.Path, project.Path, project.Path, project.Repo, deployScript)
+`, project.Path, project.Path,
+		project.Path, project.Path, project.Path,
+		project.Path, project.Path, project.Path,
+		project.Path, project.Repo, deployScript)
 
 	return c.ExecuteCommand(script)
 }
