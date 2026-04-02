@@ -159,7 +159,7 @@ Displays all configured hosts and projects.
 ### 5. Deploy
 
 ```bash
-qship deploy dev
+qship go dev
 ```
 
 Deploy to the specified environment (dev/prod).
@@ -191,12 +191,12 @@ qship auth deploy@192.168.1.100
 ### qship list / ls
 List all configured hosts and projects.
 
-### qship deploy <env>
+### qship go <env>
 Deploy to specified environment.
 
 ```bash
-qship deploy dev    # Deploy to development environment
-qship deploy prod   # Deploy to production environment
+qship go dev    # Deploy to development environment
+qship go prod   # Deploy to production environment
 ```
 
 ### qship upgrade

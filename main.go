@@ -55,9 +55,9 @@ func main() {
 		}
 		cmd.List(cfg)
 
-	case "deploy":
+	case "go":
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, "Usage: qship deploy <env> [--git-only]")
+			fmt.Fprintln(os.Stderr, "Usage: qship go <env> [--git-only]")
 			os.Exit(1)
 		}
 		gitOnly := false
@@ -121,7 +121,7 @@ Usage:
   qship check                   Check SSH agent status
   qship auth <host>             Copy SSH key to host
   qship list / ls               List hosts and projects
-  qship deploy <env> [--git-only]    Deploy to environment
+  qship go <env> [--git-only]         Deploy to environment
   qship exec "<cmd>" [hosts]    Execute command on hosts
   qship upgrade                 Upgrade to latest version`)
 }

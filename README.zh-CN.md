@@ -157,7 +157,7 @@ qship ls
 ### 5. 执行部署
 
 ```bash
-qship deploy dev
+qship go dev
 ```
 
 部署到指定环境（dev/prod）。
@@ -189,12 +189,12 @@ qship auth deploy@192.168.1.100
 ### qship list / ls
 列出所有配置的主机和项目信息。
 
-### qship deploy <env>
+### qship go <env>
 部署到指定环境。
 
 ```bash
-qship deploy dev    # 部署到开发环境
-qship deploy prod   # 部署到生产环境
+qship go dev    # 部署到开发环境
+qship go prod   # 部署到生产环境
 ```
 
 ### qship upgrade
