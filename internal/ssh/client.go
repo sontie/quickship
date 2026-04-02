@@ -14,10 +14,11 @@ import (
 )
 
 type Client struct {
-	host   string
-	user   string
-	client *ssh.Client
-	color  *color.Color
+	host       string
+	user       string
+	client     *ssh.Client
+	agentClient agent.Agent
+	color      *color.Color
 }
 
 func NewClient(host, user string, colorAttr color.Attribute) (*Client, error) {
@@ -46,11 +47,17 @@ func NewClient(host, user string, colorAttr color.Attribute) (*Client, error) {
 		return nil, fmt.Errorf("failed to dial: %w", err)
 	}
 
+	if err := agent.ForwardToAgent(client, agentClient); err != nil {
+		client.Close()
+		return nil, fmt.Errorf("failed to forward agent: %w", err)
+	}
+
 	return &Client{
-		host:   host,
-		user:   user,
-		client: client,
-		color:  color.New(colorAttr),
+		host:       host,
+		user:       user,
+		client:     client,
+		agentClient: agentClient,
+		color:      color.New(colorAttr),
 	}, nil
 }
 
