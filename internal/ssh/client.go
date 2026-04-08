@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -97,11 +98,42 @@ func (c *Client) streamOutput(r io.Reader, isErr bool) {
 	}
 }
 
+// extractGitHost parses a git repo URL and returns (host, port).
+// Supports SCP format (git@host:path) and SSH URL format (ssh://user@host:port/path).
+func extractGitHost(repo string) (host string, port string) {
+	// SSH URL format: ssh://git@hostname:port/path or ssh://git@hostname/path
+	if strings.HasPrefix(repo, "ssh://") {
+		repo = strings.TrimPrefix(repo, "ssh://")
+		if idx := strings.Index(repo, "@"); idx != -1 {
+			repo = repo[idx+1:]
+		}
+		if idx := strings.Index(repo, "/"); idx != -1 {
+			repo = repo[:idx]
+		}
+		if h, p, err := net.SplitHostPort(repo); err == nil {
+			return h, p
+		}
+		return repo, "22"
+	}
+
+	// SCP format: git@hostname:path
+	if idx := strings.Index(repo, "@"); idx != -1 {
+		repo = repo[idx+1:]
+	}
+	if idx := strings.Index(repo, ":"); idx != -1 {
+		return repo[:idx], "22"
+	}
+	return repo, "22"
+}
+
 func (c *Client) DeployProject(project config.Project, gitOnly bool) error {
 	deployScript := ""
 	if !gitOnly {
 		deployScript = project.Scripts["deploy"]
 	}
+
+	gitHost, gitPort := extractGitHost(project.Repo)
+	keyscanCmd := fmt.Sprintf("ssh-keyscan -p %s %s >> ~/.ssh/known_hosts 2>/dev/null", gitPort, gitHost)
 
 	script := fmt.Sprintf(`
 if [ ! -d "%s" ]; then
@@ -129,6 +161,8 @@ if [ ! -w "%s" ]; then
     echo ""
     exit 1
 fi
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+%s
 cd %s
 if [ ! -d ".git" ]; then
     git clone %s .
@@ -139,8 +173,7 @@ fi
 `, project.Path, project.Path,
 		project.Path, project.Path, project.Path,
 		project.Path, project.Path, project.Path,
-		project.Path, project.Repo, deployScript)
+		keyscanCmd, project.Path, project.Repo, deployScript)
 
 	return c.ExecuteCommand(script)
 }
-
