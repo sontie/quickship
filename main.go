@@ -55,21 +55,33 @@ func main() {
 		}
 		cmd.List(cfg)
 
-	case "go":
+	case "sync":
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, "Usage: qship go <env> [--git-only]")
+			fmt.Fprintln(os.Stderr, "Usage: qship sync <env>")
 			os.Exit(1)
-		}
-		gitOnly := false
-		if len(os.Args) > 3 && os.Args[3] == "--git-only" {
-			gitOnly = true
 		}
 		cfg, err := config.LoadConfig("qship.yaml")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		if err := cmd.Deploy(os.Args[2], gitOnly, cfg); err != nil {
+		if err := cmd.Sync(os.Args[2], cfg); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("✓ Git sync completed")
+
+	case "go":
+		if len(os.Args) < 3 {
+			fmt.Fprintln(os.Stderr, "Usage: qship go <env>")
+			os.Exit(1)
+		}
+		cfg, err := config.LoadConfig("qship.yaml")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := cmd.Deploy(os.Args[2], cfg); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
@@ -121,7 +133,8 @@ Usage:
   qship check                   Check SSH agent status
   qship auth <host>             Copy SSH key to host
   qship list / ls               List hosts and projects
-  qship go <env> [--git-only]         Deploy to environment
+  qship sync <env>                Sync git to environment
+  qship go <env>                 Deploy to environment
   qship exec "<cmd>" [hosts]    Execute command on hosts
   qship upgrade                 Upgrade to latest version`)
 }
