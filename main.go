@@ -73,7 +73,7 @@ func main() {
 
 	case "go":
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, "Usage: qship go <env>")
+			fmt.Fprintln(os.Stderr, "Usage: qship go <env> [--rm]")
 			os.Exit(1)
 		}
 		cfg, err := config.LoadConfig("qship.yaml")
@@ -81,11 +81,40 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		if err := cmd.Deploy(os.Args[2], cfg); err != nil {
+		env := ""
+		rmAfter := false
+		for _, arg := range os.Args[2:] {
+			if arg == "--rm" {
+				rmAfter = true
+			} else {
+				env = arg
+			}
+		}
+		if env == "" {
+			fmt.Fprintln(os.Stderr, "Usage: qship go <env> [--rm]")
+			os.Exit(1)
+		}
+		if err := cmd.Deploy(env, rmAfter, cfg); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Println("✓ Deployment completed")
+
+	case "clean":
+		if len(os.Args) < 3 {
+			fmt.Fprintln(os.Stderr, "Usage: qship clean <env>")
+			os.Exit(1)
+		}
+		cfg, err := config.LoadConfig("qship.yaml")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := cmd.Clean(os.Args[2], cfg); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("✓ Clean completed")
 
 	case "exec":
 		if len(os.Args) < 3 {
@@ -133,8 +162,9 @@ Usage:
   qship check                   Check SSH agent status
   qship auth <host>             Copy SSH key to host
   qship list / ls               List hosts and projects
-  qship sync <env>                Sync git to environment
-  qship go <env>                 Deploy to environment
+  qship sync <env>              Sync git to environment
+  qship go <env> [--rm]         Deploy to environment (--rm: clean source after deploy)
+  qship clean <env>             Clean project source code on remote servers
   qship exec "<cmd>" [hosts]    Execute command on hosts
   qship upgrade                 Upgrade to latest version`)
 }

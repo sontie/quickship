@@ -126,10 +126,27 @@ func extractGitHost(repo string) (host string, port string) {
 	return repo, "22"
 }
 
-func (c *Client) DeployProject(project config.Project, gitOnly bool) error {
+func (c *Client) CleanProject(project config.Project) error {
+	script := fmt.Sprintf(`
+if [ -d "%s" ]; then
+    rm -rf %s
+    echo "Cleaned %s"
+else
+    echo "Directory %s does not exist, skipping"
+fi
+`, project.Path, project.Path, project.Path, project.Path)
+	return c.ExecuteCommand(script)
+}
+
+func (c *Client) DeployProject(project config.Project, gitOnly bool, rmAfter bool) error {
 	deployScript := ""
 	if !gitOnly {
 		deployScript = project.Scripts["deploy"]
+	}
+
+	cleanupScript := ""
+	if rmAfter {
+		cleanupScript = fmt.Sprintf("cd / && rm -rf %s && echo 'Cleaned up %s'", project.Path, project.Path)
 	}
 
 	gitHost, gitPort := extractGitHost(project.Repo)
@@ -170,10 +187,11 @@ else
     git pull
 fi
 %s
+%s
 `, project.Path, project.Path,
 		project.Path, project.Path, project.Path,
 		project.Path, project.Path, project.Path,
-		keyscanCmd, project.Path, project.Repo, deployScript)
+		keyscanCmd, project.Path, project.Repo, deployScript, cleanupScript)
 
 	return c.ExecuteCommand(script)
 }

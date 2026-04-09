@@ -155,12 +155,17 @@ func List(cfg *config.Config) {
 
 func Sync(env string, cfg *config.Config) error {
 	fmt.Printf("Syncing git to %s environment...\n", env)
-	return executor.Deploy(env, true, cfg)
+	return executor.Deploy(env, true, false, cfg)
 }
 
-func Deploy(env string, cfg *config.Config) error {
+func Deploy(env string, rmAfter bool, cfg *config.Config) error {
 	fmt.Printf("Deploying to %s environment...\n", env)
-	return executor.Deploy(env, false, cfg)
+	return executor.Deploy(env, false, rmAfter, cfg)
+}
+
+func Clean(env string, cfg *config.Config) error {
+	fmt.Printf("Cleaning source code on %s environment...\n", env)
+	return executor.Clean(env, cfg)
 }
 
 func Exec(cmd string, hosts []string, cfg *config.Config) error {
